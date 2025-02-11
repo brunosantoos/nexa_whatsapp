@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id              Int    @id @default(autoincrement())
+  email           String @unique
+  password_digest String
+
+  @@map("admins")
+}
+
+model Messages {
+  id      Int    @id @default(autoincrement())
+  slug    String
+  content String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt()
+
+  @@map("messages")
+}
+
+model Greeting {
+  id   Int    @id @default(autoincrement())
+  text String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt()
+
+  @@map("greetings")
+}
+
+model SectorsId {
+  id       Int    @id @unique @default(autoincrement())
+  name     String
+  idSector String @unique
+
+  @@map("sectors")
+}
+
+model TokenId {
+  id      Int    @id @unique @default(autoincrement())
+  name    String
+  idToken String @unique
+
+  @@map("tokens")
+}
+
+model Seller {
+  id    Int    @unique @default(autoincrement())
+  name  String
+  email String @unique
+  phone String @unique
+
+  @@map("sellers")
+}
+
+model Status {
+  id     Int     @id @default(autoincrement())
+  name   String
+  status Boolean @default(true)
+
+  @@map("status")
+}
+
+model ReportSend {
+  id         Int      @id @default(autoincrement())
+  message    String
+  phone      String
+  created_at DateTime @default(now())
+
+  @@map("report_sends")
+}
+
+model Contact {
+  id Int @id @default(autoincrement())
+
+  name   String
+  phone  String @unique
+  email  String @unique
+  course String
+
+  segmentation Segmentation[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt()
+
+  @@map("contacts")
+}
+
+model Segmentation {
+  id Int @id @default(autoincrement())
+
+  name String @unique
+
+  contacts Contact[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt()
+
+  @@map("segmentations")
+}
