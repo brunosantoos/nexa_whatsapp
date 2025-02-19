@@ -1,5 +1,5 @@
-import { ReactNode } from 'react';
-import NoDataFound from '../NoDataFound';
+import { ReactNode } from "react";
+import NoDataFound from "../NoDataFound";
 
 export type DataTableProps<T> = {
   titles: ReactNode[];
@@ -22,7 +22,7 @@ export default function DataTable<T>({
     <div className="mt-3 border rounded-t-md overflow-x-auto  max-h-[80%]">
       <div className="relative">
         <table className="w-full text-sm text-left">
-          <thead className="text-white uppercase bg-[#0493C7] sticky top-0">
+          <thead className="text-white uppercase bg-[#0e344c] sticky top-0">
             <tr>
               {titles.map((title, index) => (
                 <th key={index} className="p-3">

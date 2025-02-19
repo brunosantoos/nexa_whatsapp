@@ -1,9 +1,9 @@
-'use client';
-import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { FaSpinner } from 'react-icons/fa';
+"use client";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { FaSpinner } from "react-icons/fa";
 
 type Values = {
   email: string;
@@ -16,22 +16,22 @@ export default function LoginAdmin() {
     handleSubmit,
     setError,
     formState: { errors },
-  } = useForm<Values>({ defaultValues: { email: '', password: '' } });
+  } = useForm<Values>({ defaultValues: { email: "", password: "" } });
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (data: Values) => {
     setLoading(true);
-    const resp = await signIn('credentials', {
+    const resp = await signIn("credentials", {
       email: data.email,
       password: data.password,
       redirect: false,
-      callbackUrl: '/',
+      callbackUrl: "/",
     });
 
     if (resp == null) {
       setLoading(false);
-      throw new Error('Unexpected error: signIn returned undefined');
+      throw new Error("Unexpected error: signIn returned undefined");
     }
 
     if (resp.ok) {
@@ -41,17 +41,17 @@ export default function LoginAdmin() {
 
     if (resp === undefined) {
       setLoading(false);
-      setError('root', { message: 'ocorreu um erro inesperado' });
+      setError("root", { message: "ocorreu um erro inesperado" });
     }
 
     switch (resp.error) {
-      case 'Invalid password':
+      case "Invalid password":
         setLoading(false);
-        setError('password', { message: 'Senha incorreta' });
+        setError("password", { message: "E-mail ou senha incorretos" });
         break;
-      case 'Invalid email':
+      case "Invalid email":
         setLoading(false);
-        setError('email', { message: 'E-mail não cadastrado' });
+        setError("email", { message: "E-mail ou senha incorretos" });
         break;
     }
   };
@@ -65,12 +65,12 @@ export default function LoginAdmin() {
           </div>
           <input
             id="email"
-            {...register('email', { required: 'obrigatório' })}
+            {...register("email", { required: "obrigatório" })}
             type="text"
             className={[
-              'border rounded-lg px-3 py-2 mt-1 text-sm w-full',
-              errors.email ? 'border-red-500' : '',
-            ].join(' ')}
+              "border rounded-lg px-3 py-2 mt-1 text-sm w-full",
+              errors.email ? "border-red-500" : "",
+            ].join(" ")}
           />
           {errors.email && (
             <small className="text-red-500">{errors.email.message}</small>
@@ -80,12 +80,12 @@ export default function LoginAdmin() {
           <div className="font-semibold text-sm text-gray-600 pb-1 ">Senha</div>
           <input
             id="password"
-            {...register('password', { required: 'obrigatório' })}
+            {...register("password", { required: "obrigatório" })}
             type="password"
             className={[
-              'border rounded-lg px-3 py-2 mt-1 text-sm w-full',
-              errors.password ? 'border-red-500' : '',
-            ].join(' ')}
+              "border rounded-lg px-3 py-2 mt-1 text-sm w-full",
+              errors.password ? "border-red-500" : "",
+            ].join(" ")}
           />
           {errors.password && (
             <small className="text-red-500">{errors.password.message}</small>
@@ -98,8 +98,8 @@ export default function LoginAdmin() {
           type="submit"
           disabled={loading}
           className={`${
-            loading ? 'opacity-60' : ' '
-          } transition duration-200 bg-accent hover:bg-blue-600 focus:bg-blue-600 focus:shadow-sm focus:ring-4 focus:ring-blue-600 focus:ring-opacity-50 text-white w-full py-2.5 rounded-lg text-lg shadow-sm hover:shadow-md font-semibold text-center inline-block`}
+            loading ? "opacity-60" : " "
+          } transition duration-200 bg-accent hover:bg-opacity-95  focus:shadow-sm focus:ring-4  text-white w-full py-2.5 rounded-lg text-lg shadow-sm hover:shadow-md font-semibold text-center inline-block`}
         >
           {loading ? (
             <div className="flex flex-row items-center m-auto">

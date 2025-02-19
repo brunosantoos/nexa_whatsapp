@@ -15,6 +15,10 @@ model Admin {
   email           String @unique
   password_digest String
 
+  messageSend      Int          @default(0)
+  messageRemaining Int          @default(10)
+  ReportSend       ReportSend[]
+
   @@map("admins")
 }
 
@@ -39,37 +43,13 @@ model Greeting {
   @@map("greetings")
 }
 
-model SectorsId {
-  id       Int    @id @unique @default(autoincrement())
-  name     String
-  idSector String @unique
-
-  @@map("sectors")
-}
-
 model TokenId {
-  id      Int    @id @unique @default(autoincrement())
+  id      Int     @id @unique @default(autoincrement())
   name    String
-  idToken String @unique
+  idToken String  @unique
+  number  String? @unique
 
   @@map("tokens")
-}
-
-model Seller {
-  id    Int    @unique @default(autoincrement())
-  name  String
-  email String @unique
-  phone String @unique
-
-  @@map("sellers")
-}
-
-model Status {
-  id     Int     @id @default(autoincrement())
-  name   String
-  status Boolean @default(true)
-
-  @@map("status")
 }
 
 model ReportSend {
@@ -78,16 +58,18 @@ model ReportSend {
   phone      String
   created_at DateTime @default(now())
 
+  admin   Admin @relation(fields: [adminId], references: [id])
+  adminId Int
+
   @@map("report_sends")
 }
 
 model Contact {
   id Int @id @default(autoincrement())
 
-  name   String
-  phone  String @unique
-  email  String @unique
-  course String
+  name  String
+  phone String  @unique
+  email String? @unique
 
   segmentation Segmentation[]
 

@@ -1,13 +1,11 @@
-import axios, { AxiosError } from 'axios';
-import { sendText } from './send-text';
+import axios from "axios";
 
-const accessToken: string | undefined = process.env.MY_TOKEN;
+const accessToken: string | undefined =
+  process.env.MY_TOKEN || "A57919A889B6-4E4E-A61A-3927FD63CDD6";
 
-interface CreateChatData {
-  contactId: string;
+export interface CreateChatData {
   number: string;
-  sectorId: string;
-  message: string;
+  text: string;
 }
 
 interface ErrorResponse {
@@ -15,42 +13,36 @@ interface ErrorResponse {
 }
 
 export async function createChat(
-  contactId: string,
   number: string,
-  message: string
+  message: string,
 ): Promise<void> {
   try {
     const createNewChatData: CreateChatData = {
-      contactId,
-      number,
-      sectorId: '5fbfb126fafaaa2b49fc1d65',
-      message,
+      number: number,
+      text: message,
     };
 
-    await axios.post(
-      `${process.env.BASE_URL}/chats/create-new`,
-      createNewChatData,
+    const response = await fetch(
+      `http://localhost:8080/message/sendText/Teste`,
       {
+        method: "POST",
         headers: {
-          'access-token': accessToken,
+          apiKey: accessToken || "",
+          "Content-Type": "application/json",
         },
-      }
+        body: JSON.stringify(createNewChatData),
+      },
     );
+
+    console.log("Response: ", await response.json());
 
     return;
   } catch (e) {
-    console.error('An error occurred:', e);
+    console.error("An error occurred:", e);
 
     if (axios.isAxiosError(e)) {
-      const axiosError: AxiosError<ErrorResponse> = e;
-
-      if (axiosError.response?.data.status === '400') {
-        console.log('Creating contact...');
-        sendText(message, number);
-        return;
-      }
     }
 
-    throw new Error('Unknown');
+    throw new Error("Unknown");
   }
 }

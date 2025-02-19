@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import DataTable from '@/app/components/admin/DataTable';
-import Link from 'next/link';
-import { useState } from 'react';
+import DataTable from "@/app/components/admin/DataTable";
+import Link from "next/link";
+import { useState } from "react";
 import {
   FaDownload,
   FaSave,
   FaSpinner,
   FaTrash,
   FaUpload,
-} from 'react-icons/fa';
-import { z } from 'zod';
+} from "react-icons/fa";
+import { z } from "zod";
 
 export default function Import() {
   const csvSchema = z
@@ -20,8 +20,7 @@ export default function Import() {
       nome: tuple[0],
       numero: tuple[1],
       email: tuple[2],
-      curso: tuple[3],
-      segmentacao: tuple[4],
+      segmentacao: tuple[3],
     }))
     .array()
     .transform(([_headers, ...data]) => data);
@@ -40,7 +39,7 @@ export default function Import() {
           <>
             <label
               className={`hover:cursor-pointer font-semibold px-7 py-3 bg-blue-500 rounded text-white flex gap-3 items-center mt-3 ${
-                isLoading ? 'bg-opacity-20' : ''
+                isLoading ? "bg-opacity-20" : ""
               }`}
             >
               {isLoading ? (
@@ -56,7 +55,7 @@ export default function Import() {
 
               <input
                 type="file"
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
                 accept=".csv"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
@@ -69,15 +68,15 @@ export default function Import() {
                   reader.onload = function () {
                     setIsLoading(false);
                     const text = reader.result as string;
-                    const rows = text.split('\n').map((row) => row.split(','));
+                    const rows = text.split("\n").map((row) => row.split(","));
 
                     const parsed = csvSchema.safeParse(rows);
                     if (parsed.success) {
                       setImportedData(
-                        parsed.data.filter((row) => !!row.numero)
+                        parsed.data.filter((row) => !!row.numero),
                       );
                     } else {
-                      setError('Invalid data format');
+                      setError("Invalid data format");
                     }
                   };
 
@@ -86,7 +85,7 @@ export default function Import() {
               />
             </label>
             <Link
-              href={'/csv-template.csv'}
+              href={"/csv-template.csv"}
               className="font-semibold px-7 py-3 bg-blue-500 rounded text-white flex gap-3 items-center mt-3"
             >
               <FaDownload /> Download Template
@@ -111,19 +110,19 @@ export default function Import() {
                   disabled={isLoading || importedData.length === 0}
                   className={`mb-5 font-semibold px-7 py-3 bg-green-500 rounded text-white flex gap-3 items-center mt-3 hover:cursor-pointer ${
                     isLoading || importedData.length === 0
-                      ? 'bg-opacity-25'
-                      : ''
+                      ? "bg-opacity-25"
+                      : ""
                   } `}
                   onClick={async () => {
                     setIsLoading(true);
 
                     const resp = await fetch(`/api/contacts`, {
-                      method: 'POST',
+                      method: "POST",
                       body: JSON.stringify(importedData),
                     });
 
                     if (resp.ok) {
-                      setSuccess('Importados com sucesso');
+                      setSuccess("Importados com sucesso");
 
                       setImportedData(null);
                       setIsLoading(false);
@@ -131,7 +130,7 @@ export default function Import() {
                     }
                     if (!resp.ok) {
                       setError(
-                        'Erro ao importar, algum campo esta com dados incorreto, por favor, valide o dados e tente novamente.'
+                        "Erro ao importar, algum campo esta com dados incorreto, por favor, valide o dados e tente novamente.",
                       );
                       setIsLoading(false);
                       return;
@@ -151,7 +150,7 @@ export default function Import() {
                 </button>
                 <button
                   className={`mb-5 font-semibold px-7 py-3 bg-red-500 rounded text-white flex gap-3 items-center mt-3 ${
-                    isLoading ? 'bg-opacity-25' : ''
+                    isLoading ? "bg-opacity-25" : ""
                   }`}
                   disabled={isLoading}
                   onClick={() => {
@@ -184,18 +183,11 @@ export default function Import() {
                   )}
                   <DataTable
                     data={importedData}
-                    titles={[
-                      'Nome',
-                      'Número',
-                      'Curso',
-                      'E-mail',
-                      'Segmentação',
-                    ]}
+                    titles={["Nome", "Número", "E-mail", "Segmentação"]}
                     idExtractor={(row) => row.nome.toString()}
                     rowGenerator={(row) => [
                       row.nome,
                       row.numero,
-                      row.curso,
                       row.email,
                       row.segmentacao,
                     ]}

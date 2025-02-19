@@ -1,13 +1,12 @@
-import prisma from '@/lib/prisma/prismaClient';
-import { NextResponse } from 'next/server';
-import z from 'zod';
+import prisma from "@/lib/prisma/prismaClient";
+import { NextResponse } from "next/server";
+import z from "zod";
 
 const dataSchema = z
   .object({
     nome: z.string(),
     numero: z.string(),
     email: z.string(),
-    curso: z.string(),
     segmentacao: z.string(),
   })
   .array();
@@ -43,7 +42,6 @@ export async function POST(request: Request): Promise<Response> {
               id,
             },
           },
-          course: entry.curso,
         },
         update: {
           name: entry.nome,
@@ -53,7 +51,6 @@ export async function POST(request: Request): Promise<Response> {
               id,
             },
           },
-          course: entry.curso,
         },
       });
     } catch (e) {

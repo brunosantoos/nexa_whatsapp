@@ -1,4 +1,4 @@
-import { sendMessage } from "@/actions/send-message";
+import { CreateChatData } from "@/functions/create-chat";
 import { formatFirstName } from "@/functions/format-first-name";
 import { replacePlaceholders } from "@/functions/replace-place-holders";
 import prisma from "@/lib/prisma/prismaClient";
@@ -17,58 +17,83 @@ export async function POST(
   },
 ): Promise<Response> {
   try {
-    const lead: LeadSession = await request.json();
+    const body: LeadSession = await request.json();
+
+    const instanceDetails = await prisma.tokenId.findUnique({
+      where: {
+        idToken: body.instance,
+      },
+    });
+
+    if (!instanceDetails) {
+      throw new Error("Instance not found");
+    }
+
+    const lead = await prisma.segmentation.findUnique({
+      where: {
+        id: body.idSegmentation,
+      },
+      include: {
+        contacts: {
+          select: {
+            phone: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!lead) {
+      throw new Error("Lead not found");
+    }
 
     try {
-      const phone = formatPhone(lead.user.phone);
+      for (const contact of lead.contacts) {
+        const phone = formatPhone(contact.phone);
 
-      const greeting: Greeting[] = await prisma.$queryRaw`
-          (SELECT * FROM "greetings" ORDER BY RANDOM() LIMIT 1)
-        `;
+        const greeting: Greeting[] = await prisma.$queryRaw`
+        (SELECT * FROM "greetings" ORDER BY RANDOM() LIMIT 1)
+      `;
 
-      const status = await prisma.status.findUnique({
-        where: {
-          id: 1,
-        },
-      });
+        const { text } = greeting[0];
 
-      if (status?.status === false) {
-        return NextResponse.json(
-          { Error: "Integração desligada" },
-          { status: 400 },
+        const textMessage = await prisma.messages.findMany({
+          where: {
+            slug: message,
+          },
+        });
+
+        const { content } = shuffle(textMessage);
+
+        const replacements: Record<string, string> = {
+          nome: formatFirstName(contact.name),
+        };
+
+        const textCreate = `${text}\n\n${content}`;
+
+        const textSend = replacePlaceholders(textCreate, replacements);
+
+        const createNewChatData: CreateChatData = {
+          number: phone,
+          text: textSend,
+        };
+
+        const response = await fetch(
+          `${process.env.BASE_URL_EVO}message/sendText/${instanceDetails.name}`,
+          {
+            method: "POST",
+            headers: {
+              apiKey: instanceDetails.idToken,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(createNewChatData),
+          },
         );
+
+        console.log(await response.json());
+
+        await new Promise((resolve) => setTimeout(resolve, 10000));
       }
-
-      const { text } = greeting[0];
-
-      const textMessage = await prisma.messages.findMany({
-        where: {
-          slug: message,
-        },
-      });
-
-      const { content } = shuffle(textMessage);
-
-      const replacements: Record<string, string> = {
-        nome: formatFirstName(lead.user.name),
-      };
-
-      const textCreate = `${text}\n\n${content}`;
-
-      const textSend = replacePlaceholders(textCreate, replacements);
-
-      await prisma.reportSend.create({
-        data: {
-          message: textSend,
-          phone,
-        },
-      });
-
-      sendMessage(phone, textSend, lead.user.name);
-
-      await new Promise((resolve) => {
-        setTimeout(resolve, 40000);
-      });
     } catch (error) {
       console.error("Error sending message:", error);
     }
