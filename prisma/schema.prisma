@@ -23,9 +23,13 @@ model Admin {
 }
 
 model Messages {
-  id      Int    @id @default(autoincrement())
-  slug    String
-  content String
+  id        Int     @id @default(autoincrement())
+  slug      String
+  content   String
+  mediatype String?
+  mimetype  String?
+  imageUrl  String?
+  fileName  String?
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt()

@@ -54,12 +54,14 @@ export default function ConfirmationButton({
             </Dialog.Description>
             <div className="gap-2 mb-4 flex flex-col">
               <Select
-                defaultValue={instances[0].idToken}
                 label="Selecione a instancia"
                 onBlur={(e) => {
                   setSelectedInstance(e.target.value);
                 }}
               >
+                <option key={0} value={"null"}>
+                  Selecione o número
+                </option>
                 {instances.map((instance) => (
                   <option key={instance.id} value={instance.idToken}>
                     {instance.name} - {instance.number}
@@ -67,23 +69,21 @@ export default function ConfirmationButton({
                 ))}
               </Select>
               <Select
-                defaultValue={messages[0].slug}
                 label="Escolha a mensagem"
                 onBlur={(e) => {
                   setSelectedMessage(e.target.value);
                 }}
               >
+                <option key={0} value={"0"}>
+                  Selecione uma mensagem
+                </option>
                 {messages.map((message) => (
                   <option
                     key={message.id}
                     value={message.slug}
                     title={message.content}
                   >
-                    <span className="text-gray-400">
-                      {message.content.length > 50
-                        ? message.content.substring(0, 50) + "..."
-                        : message.content}
-                    </span>
+                    <span className="text-gray-400">{message.slug}</span>
                   </option>
                 ))}
               </Select>

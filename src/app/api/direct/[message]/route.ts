@@ -92,7 +92,9 @@ export async function POST(
 
         console.log(await response.json());
 
-        await new Promise((resolve) => setTimeout(resolve, 10000));
+        await new Promise((resolve) =>
+          setTimeout(resolve, parseInt(body.selectedInterval)),
+        );
       }
     } catch (error) {
       console.error("Error sending message:", error);

@@ -1,13 +1,13 @@
-import Navbar from '@/app/components/admin/NavBar';
-import type { Metadata } from 'next';
-import { getServerSession } from 'next-auth';
-import { redirect } from 'next/navigation';
-import { ToastContainer } from 'react-toastify';
-import '../globals.css';
+import Navbar from "@/app/components/admin/NavBar";
+import type { Metadata } from "next";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { ToastContainer } from "react-toastify";
+import "../globals.css";
 
 export const metadata: Metadata = {
-  title: 'Integração RD - HandChat',
-  description: '',
+  title: "Nexa - Tecnologia e Comunicação",
+  description: "",
 };
 
 export const revalidate = 0;
@@ -19,7 +19,7 @@ export default async function AdminLayout({
 }) {
   const session = await getServerSession();
 
-  if (!session) redirect('/login');
+  if (!session) redirect("/login");
 
   return (
     <>
