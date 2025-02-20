@@ -79,7 +79,7 @@ export async function POST(
         };
 
         const response = await fetch(
-          `${process.env.BASE_URL_EVO}message/sendText/${instanceDetails.name}`,
+          `https://evo-api.brunosantos.cloud/message/sendText/${instanceDetails.name}`,
           {
             method: "POST",
             headers: {
