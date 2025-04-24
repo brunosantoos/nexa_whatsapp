@@ -2,17 +2,18 @@
 
 import { Select } from "@/app/components/Utils/Select";
 import { Dialog } from "@headlessui/react";
+import { Messages, TokenId } from "@prisma/client";
 import { useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 
 type ConfirmationButtonProps = {
-  id: string;
+  id: number;
   emailAdmin: string;
   className: string;
   children: React.ReactNode;
   title: string;
-  instances: { id: number; name: string; idToken: string; number: string }[];
-  messages: { id: number; title: string; slug: string; content: string }[];
+  instances: TokenId[];
+  messages: Messages[];
   totalContacts: number;
 };
 

@@ -7,7 +7,7 @@ import ModalSendMessageProps from "./send";
 
 export const revalidate = 1;
 
-export default async function Page({ params }: { params: { id: number } }) {
+export default async function Page({ params }: { params: { id: string } }) {
   const { id } = params;
 
   const data = await prisma.contact.findMany({
