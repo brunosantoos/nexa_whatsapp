@@ -17,11 +17,12 @@ export default async function Page() {
       <Form />
       <DataTable
         data={data}
-        titles={["Nome", "id setor", "Editar"]}
+        titles={["Nome", "id setor", "numero", "Editar"]}
         idExtractor={(row) => row.id.toString()}
         rowGenerator={(row) => [
           row.name,
           row.idToken,
+          row.number,
           <Form token={row} key={row.id} />,
         ]}
       />

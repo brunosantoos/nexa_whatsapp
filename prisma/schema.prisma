@@ -15,6 +15,8 @@ model Admin {
   email           String @unique
   password_digest String
 
+  isAdmin Boolean @default(true)
+
   messageSend      Int          @default(0)
   messageRemaining Int          @default(10)
   ReportSend       ReportSend[]
@@ -26,13 +28,13 @@ model Messages {
   id        Int     @id @default(autoincrement())
   slug      String
   content   String
-  mediatype String?
-  mimetype  String?
-  imageUrl  String?
-  fileName  String?
+  haveMedia Boolean @default(false)
+
+  image Media? @relation(fields: [mediaUrl], references: [url])
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt()
+  mediaUrl   String?
 
   @@map("messages")
 }
@@ -94,4 +96,10 @@ model Segmentation {
   updated_at DateTime @updatedAt()
 
   @@map("segmentations")
+}
+
+model Media {
+  url      String     @id @unique
+  mine     String
+  Messages Messages[]
 }

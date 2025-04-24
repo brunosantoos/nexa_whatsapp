@@ -12,11 +12,18 @@ export default function Greeting({ data }: { data: Messages[] }) {
       <ToastContainer />
       <DataTable
         data={data}
-        titles={["Slug", "Conteudo", "Editar", "Apagar"]}
+        titles={["Slug", "Conteudo", "Imagem", "Editar", "Apagar"]}
         idExtractor={(row) => row.slug.toString()}
         rowGenerator={(row) => [
           row.slug,
           row.content,
+          <>
+            {row.haveMedia ? (
+              <img src={row.mediaUrl!} className="w-48" alt="image" />
+            ) : (
+              "Apenas texto"
+            )}
+          </>,
           <FormMessage key={row.slug} messages={row} />,
           <DeleteButton id={row.id} key={row.slug} />,
         ]}

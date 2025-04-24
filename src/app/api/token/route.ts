@@ -10,11 +10,12 @@ export async function POST(request: Request): Promise<Response> {
     return NextResponse.json({ message: "not logged in" }, { status: 401 });
   }
   try {
-    const { name, idToken } = await request.json();
+    const { name, idToken, number } = await request.json();
 
     await createInstance({
       name,
       idToken,
+      number,
     });
 
     return NextResponse.json({ message: "Success" });

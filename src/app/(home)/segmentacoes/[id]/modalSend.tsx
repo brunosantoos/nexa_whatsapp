@@ -2,19 +2,18 @@
 
 import { Select } from "@/app/components/Utils/Select";
 import { Dialog } from "@headlessui/react";
-import { Messages, TokenId } from "@prisma/client";
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 
-export type ConfirmationButtonProps = {
-  id: number;
-  className?: string;
-  title?: string;
-  children?: ReactNode | ReactNode[];
-  totalContacts?: number;
-  instances: TokenId[];
-  messages: Messages[];
+type ConfirmationButtonProps = {
+  id: string;
   emailAdmin: string;
+  className: string;
+  children: React.ReactNode;
+  title: string;
+  instances: { id: number; name: string; idToken: string; number: string }[];
+  messages: { id: number; title: string; slug: string; content: string }[];
+  totalContacts: number;
 };
 
 export default function ConfirmationButton({
@@ -32,6 +31,40 @@ export default function ConfirmationButton({
   const [selectedInstance, setSelectedInstance] = useState<string | null>(null);
   const [selectedMessage, setSelectedMessage] = useState<string | null>(null);
   const [selectedInterval, setSelectedInterval] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const handleSend = async () => {
+    setIsLoading(true);
+    setErrorMessage(null);
+    try {
+      const response = await fetch(`/api/direct/${selectedMessage}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          instance: selectedInstance,
+          emailAdmin,
+          idSegmentation: id,
+          selectedInterval,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setErrorMessage(data.message || "Erro ao enviar as mensagens.");
+        return;
+      }
+
+      setIsOpen(false); // fecha apenas se tudo der certo
+    } catch (err) {
+      setErrorMessage("Erro inesperado ao tentar enviar.");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
@@ -52,6 +85,7 @@ export default function ConfirmationButton({
               Deseja realmente enviar mensagem para {totalContacts} contatos
               desta segmentação?
             </Dialog.Description>
+
             <div className="gap-2 mb-4 flex flex-col">
               <Select
                 label="Selecione a instancia"
@@ -79,7 +113,7 @@ export default function ConfirmationButton({
                 </option>
                 {messages.map((message) => (
                   <option
-                    key={message.id}
+                    key={message.slug}
                     value={message.slug}
                     title={message.content}
                   >
@@ -116,32 +150,23 @@ export default function ConfirmationButton({
               </Select>
             </div>
 
+            {errorMessage && (
+              <div className="text-red-500 mb-4 font-semibold">
+                {errorMessage === "No credits"
+                  ? "Você não possui créditos suficientes para enviar mensagens. Entre em contato com o suporte."
+                  : errorMessage.includes("Credits exhausted")
+                  ? `Créditos esgotados. Algumas mensagens foram enviadas antes do erro. ${errorMessage} Entre em contato com o suporte.`
+                  : "Ocorreu um erro ao tentar enviar as mensagens. Tente novamente ou entre em contato com o suporte."}
+              </div>
+            )}
+
             <div className="flex gap-3">
               <button
                 className={`bg-green-500 text-white px-5 py-2 rounded-full font-semibold hover:bg-opacity-90 ${
                   isLoading ? "bg-opacity-30" : ""
                 }`}
                 disabled={isLoading}
-                onClick={async () => {
-                  try {
-                    setIsLoading(true);
-                    await fetch(`/api/direct/${selectedMessage}`, {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify({
-                        instance: selectedInstance,
-                        emailAdmin,
-                        idSegmentation: id,
-                        selectedInterval,
-                      }),
-                    });
-                  } finally {
-                    setIsLoading(false);
-                    setIsOpen(false);
-                  }
-                }}
+                onClick={handleSend}
               >
                 {isLoading ? (
                   <div className="flex flex-row gap-2 items-center font-semibold">

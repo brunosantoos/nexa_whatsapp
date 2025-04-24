@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 type Values = {
   name: string;
   idToken: string;
+  number: string;
 };
 
 export default function Form({ token }: { token?: TokenId }) {
@@ -23,6 +24,7 @@ export default function Form({ token }: { token?: TokenId }) {
     defaultValues: {
       name: token?.name || "",
       idToken: token?.idToken || "",
+      number: token?.number || "",
     },
   });
 
@@ -91,92 +93,104 @@ export default function Form({ token }: { token?: TokenId }) {
                   </Dialog.Title>
                   <form
                     className="grid-cols-2 md:grid-cols-2 gap-3"
-                    onSubmit={handleSubmit(async ({ name, idToken }) => {
-                      if (token) {
-                        try {
-                          await axios.put(`/api/sectors/${token.id}`, {
-                            name,
-                            idToken,
-                          });
+                    onSubmit={handleSubmit(
+                      async ({ name, idToken, number }) => {
+                        if (token) {
+                          try {
+                            await axios.put(`/api/sectors/${token.id}`, {
+                              name,
+                              idToken,
+                              number,
+                            });
 
-                          toast.success("Token atualizado com sucesso!", {
-                            position: "bottom-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                            theme: "light",
-                          });
+                            toast.success("Token atualizado com sucesso!", {
+                              position: "bottom-center",
+                              autoClose: 5000,
+                              hideProgressBar: false,
+                              closeOnClick: true,
+                              pauseOnHover: true,
+                              draggable: true,
+                              progress: undefined,
+                              theme: "light",
+                            });
 
-                          handleModal();
-                          window.location.reload();
-                          return;
-                        } catch (error) {
-                          console.log(error);
-                          toast.error("Erro ao atualizar token!", {
-                            position: "bottom-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                            theme: "light",
-                          });
+                            handleModal();
+                            window.location.reload();
+                            return;
+                          } catch (error) {
+                            console.log(error);
+                            toast.error("Erro ao atualizar token!", {
+                              position: "bottom-center",
+                              autoClose: 5000,
+                              hideProgressBar: false,
+                              closeOnClick: true,
+                              pauseOnHover: true,
+                              draggable: true,
+                              progress: undefined,
+                              theme: "light",
+                            });
+                          }
                         }
-                      }
-                      if (!token) {
-                        try {
-                          await axios.post(`/api/token`, {
-                            name,
-                            idToken,
-                          });
+                        if (!token) {
+                          try {
+                            await axios.post(`/api/token`, {
+                              name,
+                              idToken,
+                              number,
+                            });
 
-                          toast.success("Token criado com sucesso!", {
-                            position: "bottom-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                            theme: "light",
-                          });
+                            toast.success("Token criado com sucesso!", {
+                              position: "bottom-center",
+                              autoClose: 5000,
+                              hideProgressBar: false,
+                              closeOnClick: true,
+                              pauseOnHover: true,
+                              draggable: true,
+                              progress: undefined,
+                              theme: "light",
+                            });
 
-                          handleModal();
-                          window.location.reload();
-                          return;
-                        } catch (error) {
-                          toast.error("Erro ao criar token!", {
-                            position: "bottom-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                            theme: "light",
-                          });
-                          return;
+                            handleModal();
+                            window.location.reload();
+                            return;
+                          } catch (error) {
+                            toast.error("Erro ao criar token!", {
+                              position: "bottom-center",
+                              autoClose: 5000,
+                              hideProgressBar: false,
+                              closeOnClick: true,
+                              pauseOnHover: true,
+                              draggable: true,
+                              progress: undefined,
+                              theme: "light",
+                            });
+                            return;
+                          }
                         }
-                      }
-                    })}
+                      },
+                    )}
                   >
                     <Input
-                      label="Nome do setor"
+                      label="Nome do conexão"
                       type="text"
                       defaultValue={token?.name}
                       error={errors.name?.message}
                       {...register("name", {})}
                     />
                     <Input
-                      label="Id do Setor"
+                      label="Token da conexão"
                       type="text"
                       defaultValue={token?.idToken}
                       error={errors.idToken?.message}
                       {...register("idToken", {})}
+                    />
+                    <Input
+                      label="Numero de telefone"
+                      type="text"
+                      required
+                      defaultValue={token?.number!}
+                      error={errors.number?.message}
+                      {...register("number", {})}
                     />
 
                     {isSubmitSuccessful && (
@@ -225,38 +239,6 @@ const Input = forwardRef<
         <div>{label}</div>
         <div>
           <input
-            {...props}
-            className={[
-              "block border rounded px-4 py-1 w-full focus:ring focus:outline-none transition-shadow",
-              error ? "border-red-500" : "border-gray-300",
-              className,
-            ].join(" ")}
-            ref={ref}
-          />
-          <p className="text-sm text-red-500">{error}</p>
-        </div>
-      </label>
-    </div>
-  );
-});
-
-const TextArea = forwardRef<
-  HTMLTextAreaElement,
-  HTMLProps<HTMLTextAreaElement> & {
-    label?: string;
-    containerClass?: string;
-    error?: string;
-  }
->(function TextArea(
-  { className, containerClass, label, error, ...props },
-  ref,
-) {
-  return (
-    <div className={containerClass}>
-      <label>
-        <div>{label}</div>
-        <div>
-          <textarea
             {...props}
             className={[
               "block border rounded px-4 py-1 w-full focus:ring focus:outline-none transition-shadow",
