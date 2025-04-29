@@ -6,7 +6,6 @@ const dataSchema = z
   .object({
     nome: z.string(),
     numero: z.string(),
-    email: z.string(),
     segmentacao: z.string(),
   })
   .array();
@@ -19,7 +18,7 @@ export async function POST(request: Request): Promise<Response> {
 
   for (const entry of data) {
     try {
-      const { id } = await prisma.segmentation.upsert({
+      const segmentation = await prisma.segmentation.upsert({
         where: {
           name: entry.segmentacao.toUpperCase(),
         },
@@ -29,31 +28,44 @@ export async function POST(request: Request): Promise<Response> {
         update: {},
       });
 
-      await prisma.contact.upsert({
+      const existingContact = await prisma.contact.findUnique({
         where: {
           phone: entry.numero,
         },
-        create: {
-          phone: entry.numero,
-          name: entry.nome,
-          email: entry.email,
-          segmentation: {
-            connect: {
-              id,
-            },
-          },
-        },
-        update: {
-          name: entry.nome,
-          email: entry.email,
-          segmentation: {
-            connect: {
-              id,
-            },
-          },
+        include: {
+          segmentation: true,
         },
       });
+
+      if (existingContact) {
+        await prisma.contact.update({
+          where: {
+            phone: entry.numero,
+          },
+          data: {
+            name: entry.nome,
+            segmentation: {
+              connect: {
+                id: segmentation.id,
+              },
+            },
+          },
+        });
+      } else {
+        await prisma.contact.create({
+          data: {
+            phone: entry.numero,
+            name: entry.nome,
+            segmentation: {
+              connect: {
+                id: segmentation.id,
+              },
+            },
+          },
+        });
+      }
     } catch (e) {
+      console.log(e);
       if (e instanceof Error) {
         errors.push(e);
       }

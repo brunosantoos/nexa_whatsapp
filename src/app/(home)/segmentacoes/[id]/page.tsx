@@ -45,9 +45,9 @@ export default async function Page({ params }: { params: { id: string } }) {
       </div>
       <DataTable
         data={data}
-        titles={["Nome", "Número", "E-mail"]}
+        titles={["Nome", "Número"]}
         idExtractor={(row) => row.id.toString()}
-        rowGenerator={(row) => [row.name, row.phone, row.email]}
+        rowGenerator={(row) => [row.name, row.phone]}
       />
     </>
   );

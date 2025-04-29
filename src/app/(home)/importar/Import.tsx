@@ -19,8 +19,7 @@ export default function Import() {
     .transform((tuple) => ({
       nome: tuple[0],
       numero: tuple[1],
-      email: tuple[2],
-      segmentacao: tuple[3],
+      segmentacao: tuple[2],
     }))
     .array()
     .transform(([_headers, ...data]) => data);
@@ -183,12 +182,11 @@ export default function Import() {
                   )}
                   <DataTable
                     data={importedData}
-                    titles={["Nome", "Número", "E-mail", "Segmentação"]}
+                    titles={["Nome", "Número", "Segmentação"]}
                     idExtractor={(row) => row.nome.toString()}
                     rowGenerator={(row) => [
                       row.nome,
                       row.numero,
-                      row.email,
                       row.segmentacao,
                     ]}
                   />
